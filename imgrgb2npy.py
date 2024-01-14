@@ -2,11 +2,11 @@ import cv2
 import os
 import numpy as np
 
-npy_save_path = 'data/'
-train_dir = 'movingmnist/train/'
-valid_dir = 'movingmnist/valid/'
-frame_size = 64
-mode = 'train'
+npy_save_path = 'E:\CloudDataset\TSI/cloud_dataset13000/npy/'
+train_dir = 'E:\CloudDataset\TSI\cloud_dataset13000/train'
+valid_dir = 'E:\CloudDataset\TSI\cloud_dataset13000/valid'
+frame_size = 256
+mode = 'valid'
 
 
 def countFile(dir):
@@ -56,9 +56,6 @@ def gen_npz_data(path):
                                                         'input_raw_data.npy', 'mydata_valid.npz'))
 
 
-
-
-
 def gen_npy_clips(frame_nums, save_path):
     dim2 = frame_nums // 20
     clips = np.ndarray(shape=(2, dim2, 2), dtype=np.int32)
@@ -75,7 +72,7 @@ def gen_npy_clips(frame_nums, save_path):
 
 
 def gen_npy_dims(frame_size, save_path):
-    dims = np.array([[1, frame_size, frame_size]], dtype=np.int32)
+    dims = np.array([[3, frame_size, frame_size]], dtype=np.int32)
     np.save(save_path + 'dims.npy', dims)
     print('dims.npy is saved in path:%s' % save_path)
     print('shape:', dims.shape)
@@ -95,13 +92,13 @@ def gen_raw_data(img_path, img_size, save_path):
         # img_list = os.listdir(img_path)
         contents = []
         for numbers in img_list:  # 遍历图片文件名
-            contents.append(int(numbers[6:-4]))  # 保存图片文件编号,去除掉文件格式后缀，如.jpg等
+            contents.append(int(numbers[:-4]))  # 保存图片文件编号,去除掉文件格式后缀，如.jpg等
         start = min(contents)  # 记录起始文件编号
         for i in range(start, len(img_list) + start):  # 起始编号为start的图片开始向后操作图片数量个循环
-            img = cv2.imread(img_path + folders + '/%d.jpg' % i)
-            # img = cv2.imread(img_path + '/%d.jpg' % i)
+
+            img = cv2.imread(os.path.join(img_path, folders, '%d.jpg' % i))  # 使用os.path.join拼接路径
             img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
-            # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  #转为灰度图像
             img = np.float32(img)
             dst = np.zeros(img.shape, dtype=np.float32)
             img = cv2.normalize(img, dst, alpha=0, beta=1.0, norm_type=cv2.NORM_MINMAX)
